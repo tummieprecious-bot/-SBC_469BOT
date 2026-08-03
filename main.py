@@ -1,6 +1,7 @@
 import os
 import logging
 import random
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 from jokes import JOKES, TRIVIA, FUN_FACTS
@@ -67,14 +68,12 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def joke(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send a joke based on category or random."""
     try:
-        # Check if user specified a category
         if context.args and context.args[0].lower() in CATEGORIES:
             category = context.args[0].lower()
             jokes_list = JOKES.get(category, JOKES["general"])
             joke_text = random.choice(jokes_list)
             await update.message.reply_text(f"😂 *{category.capitalize()} Joke:*\n\n{joke_text}", parse_mode="Markdown")
         else:
-            # Random joke from any category
             category = random.choice(CATEGORIES)
             jokes_list = JOKES.get(category, JOKES["general"])
             joke_text = random.choice(jokes_list)
@@ -132,7 +131,7 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(about_text, parse_mode="Markdown")
 
-# Callback Query Handlers (for inline buttons)
+# Callback Query Handlers
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle button clicks."""
     query = update.callback_query
@@ -180,7 +179,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text("🎭 *Welcome back to JokerBot!*\n\nWhat would you like to do?", reply_markup=reply_markup, parse_mode="Markdown")
 
-# Error handler
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Log errors."""
     logger.error(f"Update {update} caused error {context.error}")
@@ -190,6 +188,9 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     """Start the bot."""
     try:
+        print("🤖 JokerBot is starting...")
+        print(f"📡 Bot Token: {'*' * 10} (hidden for security)")
+        
         # Create the Application
         application = Application.builder().token(BOT_TOKEN).build()
 
@@ -209,12 +210,14 @@ def main():
         # Add error handler
         application.add_error_handler(error_handler)
 
-        # Start the bot
-        print("🤖 JokerBot is starting...")
+        # Start the bot with polling
+        print("✅ Bot is running and polling for updates...")
         application.run_polling(allowed_updates=Update.ALL_TYPES)
+        
     except Exception as e:
         print(f"❌ Error starting bot: {e}")
-        logging.error(f"Error starting bot: {e}")
+        logger.error(f"Error starting bot: {e}")
+        raise
 
 if __name__ == "__main__":
     main()
