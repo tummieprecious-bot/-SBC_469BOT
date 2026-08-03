@@ -189,28 +189,32 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     """Start the bot."""
-    # Create the Application
-    application = Application.builder().token(BOT_TOKEN).build()
+    try:
+        # Create the Application
+        application = Application.builder().token(BOT_TOKEN).build()
 
-    # Add command handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("menu", menu))
-    application.add_handler(CommandHandler("joke", joke))
-    application.add_handler(CommandHandler("roll", roll))
-    application.add_handler(CommandHandler("flip", flip))
-    application.add_handler(CommandHandler("trivia", trivia))
-    application.add_handler(CommandHandler("fact", fact))
-    application.add_handler(CommandHandler("about", about))
+        # Add command handlers
+        application.add_handler(CommandHandler("start", start))
+        application.add_handler(CommandHandler("menu", menu))
+        application.add_handler(CommandHandler("joke", joke))
+        application.add_handler(CommandHandler("roll", roll))
+        application.add_handler(CommandHandler("flip", flip))
+        application.add_handler(CommandHandler("trivia", trivia))
+        application.add_handler(CommandHandler("fact", fact))
+        application.add_handler(CommandHandler("about", about))
 
-    # Add callback query handler
-    application.add_handler(CallbackQueryHandler(button_callback))
+        # Add callback query handler
+        application.add_handler(CallbackQueryHandler(button_callback))
 
-    # Add error handler
-    application.add_error_handler(error_handler)
+        # Add error handler
+        application.add_error_handler(error_handler)
 
-    # Start the bot
-    print("🤖 JokerBot is starting...")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+        # Start the bot
+        print("🤖 JokerBot is starting...")
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
+    except Exception as e:
+        print(f"❌ Error starting bot: {e}")
+        logging.error(f"Error starting bot: {e}")
 
 if __name__ == "__main__":
     main()
